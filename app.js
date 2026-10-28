@@ -24,12 +24,12 @@ function setMode(next) {
   nameField.hidden = !register;
   form.elements.name.required = register;
   password.autocomplete = register ? 'new-password' : 'current-password';
-  title.textContent = register ? 'Создай аккаунт' : 'С возвращением';
-  subtitle.textContent = register ? 'Пара деталей — и ты внутри.' : 'Рады видеть тебя снова. Войди в аккаунт.';
-  submitLabel.textContent = register ? 'Создать аккаунт' : 'Войти в аккаунт';
+  title.textContent = register ? 'Регистрация' : 'Войти';
+  subtitle.textContent = register ? 'Создай аккаунт по электронной почте.' : 'Войди, используя почту или аккаунт провайдера.';
+  submitLabel.textContent = register ? 'Зарегистрироваться' : 'Войти';
   step.textContent = register ? '02 — 02' : '01 — 02';
   switchCopy.firstChild.textContent = register ? 'Уже есть аккаунт? ' : 'Впервые здесь? ';
-  switchButton.innerHTML = register ? 'Войти <span>↗</span>' : 'Создать аккаунт <span>↗</span>';
+  switchButton.textContent = register ? 'Войти' : 'Зарегистрироваться';
   errorBox.textContent = '';
 }
 
@@ -57,7 +57,7 @@ form.addEventListener('submit', async (event) => {
     showUser(result.user);
   } catch (error) {
     errorBox.textContent = error.message || 'Сервер недоступен. Попробуй ещё раз.';
-    submitLabel.textContent = mode === 'register' ? 'Создать аккаунт' : 'Войти в аккаунт';
+    submitLabel.textContent = mode === 'register' ? 'Зарегистрироваться' : 'Войти';
     button.disabled = false;
   }
 });
@@ -69,7 +69,7 @@ function showUser(user) {
   document.querySelector('#account-email').textContent = user.email;
   document.querySelector('#account-avatar').textContent = (user.name || user.email).trim().charAt(0).toUpperCase();
   document.querySelector('#account-provider').textContent = user.provider;
-  document.querySelector('#welcome-copy').textContent = `Добро пожаловать, ${user.name}. Твоя сессия защищена.`;
+  document.querySelector('#welcome-copy').textContent = `Вошли как ${user.name}.`;
 }
 
 document.querySelector('#logout-button').addEventListener('click', async () => {

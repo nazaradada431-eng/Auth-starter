@@ -3,58 +3,78 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="theme-color" content="#090b10" />
-    <meta name="description" content="Минималистичная авторизация с почтой и OAuth." />
-    <title>Auth — твое пространство</title>
+    <meta name="theme-color" content="#f7f8fa" />
+    <meta name="description" content="Auth Starter — пример регистрации и входа." />
+    <title>Auth Starter</title>
     <link rel="stylesheet" href="styles.css" />
     <script src="app.js" defer></script>
   </head>
   <body>
-    <main class="page-shell">
-      <nav class="topbar" aria-label="Главная навигация">
-        <a class="brand" href="./" aria-label="Auth, главная"><span class="brand-icon">a<span>.</span></span><span>auth<span class="brand-slash">/</span></span></a>
-        <span class="topbar-note"><span class="status-dot"></span> СИСТЕМА АКТИВНА</span>
-      </nav>
-      <section class="layout">
-        <div class="intro">
-          <div class="eyebrow"><span class="eyebrow-line"></span> ТВОЁ ПРОСТРАНСТВО НАЧИНАЕТСЯ ЗДЕСЬ</div>
-          <h1>Вход в<br />новое<span class="accent">.</span></h1>
-          <p class="intro-copy">Всё, что тебе важно.<br />В одном безопасном месте.</p>
-          <div class="feature-list">
-            <div class="feature"><span class="feature-icon">↗</span><span>Только ты и твои данные</span><span class="feature-index">01</span></div>
-            <div class="feature"><span class="feature-icon">⌘</span><span>Вход в одно касание</span><span class="feature-index">02</span></div>
-            <div class="feature"><span class="feature-icon">◉</span><span>Защищённая сессия</span><span class="feature-index">03</span></div>
+    <header class="topbar">
+      <a class="brand" href="./">auth-starter</a>
+      <span class="project-note">Node.js · OAuth demo</span>
+    </header>
+
+    <main class="main">
+      <section class="auth-card" aria-labelledby="form-title">
+        <div id="auth-view">
+          <div class="card-topline">
+            <span class="card-label">AUTH STARTER</span>
+            <span class="card-step" id="step-label">01 / 02</span>
           </div>
-          <div class="intro-footer"><span>AUTH STARTER</span><span>v1.0.0&nbsp; / &nbsp;SECURE BY DESIGN</span></div>
+          <h1 id="form-title">Войти</h1>
+          <p class="card-subtitle" id="form-subtitle">Войди, используя почту или аккаунт провайдера.</p>
+
+          <div class="oauth-stack">
+            <a class="oauth-button" href="/auth/google" id="google-button">
+              <span class="google-mark" aria-hidden="true">G</span>
+              <span>Продолжить с Google</span>
+            </a>
+            <a class="oauth-button" href="/auth/github" id="github-button">
+              <svg class="github-mark" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 .9a11.1 11.1 0 0 0-3.51 21.63c.56.1.76-.24.76-.54v-2.1c-3.1.67-3.75-1.31-3.75-1.31-.51-1.29-1.24-1.63-1.24-1.63-1.01-.69.08-.68.08-.68 1.12.08 1.71 1.15 1.71 1.15 1 .71 2.62.5 3.26.38.1-.72.39-1.21.7-1.49-2.48-.28-5.09-1.24-5.09-5.52 0-1.22.43-2.22 1.15-3-.12-.28-.5-1.42.11-2.96 0 0 .94-.3 3.05 1.15a10.6 10.6 0 0 1 5.56 0c2.11-1.45 3.05-1.15 3.05-1.15.61 1.54.23 2.68.11 2.96.71.78 1.14 1.78 1.14 3 0 4.29-2.61 5.23-5.1 5.51.4.34.75 1 .75 2.02v3c0 .3.2.65.77.54A11.1 11.1 0 0 0 12 .9Z"/></svg>
+              <span>Продолжить с GitHub</span>
+            </a>
+          </div>
+
+          <div class="divider"><span>или по почте</span></div>
+
+          <form id="auth-form" novalidate>
+            <label class="field" id="name-field" hidden>
+              <span>Имя</span>
+              <input type="text" name="name" autocomplete="name" placeholder="Александр" minlength="2" maxlength="60" />
+            </label>
+            <label class="field">
+              <span>Электронная почта</span>
+              <input type="email" name="email" autocomplete="email" placeholder="you@example.com" required maxlength="254" />
+            </label>
+            <label class="field">
+              <span>Пароль</span>
+              <div class="password-wrap">
+                <input type="password" name="password" autocomplete="current-password" placeholder="Не менее 8 символов" required minlength="8" maxlength="128" />
+                <button type="button" class="password-toggle" aria-label="Показать пароль">Показать</button>
+              </div>
+            </label>
+            <button class="submit-button" type="submit"><span id="submit-label">Войти</span></button>
+          </form>
+
+          <p class="form-error" id="form-error" role="alert" aria-live="polite"></p>
+          <p class="switch-copy" id="switch-copy">Нет аккаунта? <button type="button" id="switch-mode">Зарегистрироваться</button></p>
         </div>
 
-        <div class="auth-card" id="auth-card">
-          <div id="auth-view">
-            <div class="card-topline"><span class="card-label">ЛИЧНЫЙ КАБИНЕТ</span><span class="card-step" id="step-label">01 — 02</span></div>
-            <h2 id="form-title">С возвращением</h2>
-            <p class="card-subtitle" id="form-subtitle">Рады видеть тебя снова. Войди в аккаунт.</p>
-            <div class="oauth-stack">
-              <a class="oauth-button" href="/auth/google" id="google-button"><span class="google-mark" aria-hidden="true">G</span><span>Продолжить с Google</span><span class="button-arrow">↗</span></a>
-              <a class="oauth-button secondary-oauth" href="/auth/github" id="github-button"><svg class="github-mark" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 .9a11.1 11.1 0 0 0-3.51 21.63c.56.1.76-.24.76-.54v-2.1c-3.1.67-3.75-1.31-3.75-1.31-.51-1.29-1.24-1.63-1.24-1.63-1.01-.69.08-.68.08-.68 1.12.08 1.71 1.15 1.71 1.15 1 .71 2.62.5 3.26.38.1-.72.39-1.21.7-1.49-2.48-.28-5.09-1.24-5.09-5.52 0-1.22.43-2.22 1.15-3-.12-.28-.5-1.42.11-2.96 0 0 .94-.3 3.05 1.15a10.6 10.6 0 0 1 5.56 0c2.11-1.45 3.05-1.15 3.05-1.15.61 1.54.23 2.68.11 2.96.71.78 1.14 1.78 1.14 3 0 4.29-2.61 5.23-5.1 5.51.4.34.75 1 .75 2.02v3c0 .3.2.65.77.54A11.1 11.1 0 0 0 12 .9Z"/></svg><span>Продолжить с GitHub</span><span class="button-arrow">↗</span></a>
-            </div>
-            <div class="divider"><span></span><span>ИЛИ ПО ПОЧТЕ</span><span></span></div>
-            <form id="auth-form" novalidate>
-              <label class="field" id="name-field" hidden><span>ТВОЁ ИМЯ</span><input type="text" name="name" autocomplete="name" placeholder="Александр" minlength="2" maxlength="60" /></label>
-              <label class="field"><span>ЭЛЕКТРОННАЯ ПОЧТА</span><input type="email" name="email" autocomplete="email" placeholder="you@example.com" required maxlength="254" /></label>
-              <label class="field"><span>ПАРОЛЬ</span><div class="password-wrap"><input type="password" name="password" autocomplete="current-password" placeholder="Минимум 8 символов" required minlength="8" maxlength="128" /><button type="button" class="password-toggle" aria-label="Показать пароль">ПОКАЗАТЬ</button></div></label>
-              <button class="submit-button" type="submit"><span id="submit-label">Войти в аккаунт</span><span class="submit-arrow">→</span></button>
-            </form>
-            <div class="form-error" id="form-error" role="alert" aria-live="polite"></div>
-            <p class="switch-copy" id="switch-copy">Впервые здесь? <button type="button" id="switch-mode">Создать аккаунт <span>↗</span></button></p>
-            <p class="legal">Продолжая, ты соглашаешься с <a href="#terms">условиями использования</a><br />и <a href="#privacy">политикой конфиденциальности</a>.</p>
+        <div class="signed-in" id="signed-in" hidden>
+          <div class="card-topline"><span class="card-label">AUTH STARTER</span></div>
+          <h1>Аккаунт</h1>
+          <p class="card-subtitle" id="welcome-copy">Вы вошли.</p>
+          <div class="account-chip">
+            <span class="account-avatar" id="account-avatar">A</span>
+            <span class="account-details"><strong id="account-name"></strong><small id="account-email"></small></span>
+            <span class="account-provider" id="account-provider"></span>
           </div>
-          <div class="signed-in" id="signed-in" hidden>
-            <div class="success-icon">✓</div><div class="card-label">СЕССИЯ ЗАЩИЩЕНА</div><h2>Ты внутри<span class="accent">.</span></h2><p class="card-subtitle" id="welcome-copy">Рады видеть тебя.</p><div class="account-chip"><span class="account-avatar" id="account-avatar">A</span><span class="account-details"><strong id="account-name"></strong><small id="account-email"></small></span><span class="account-provider" id="account-provider"></span></div><button class="submit-button logout-button" id="logout-button"><span>Выйти из аккаунта</span><span class="submit-arrow">↗</span></button>
-          </div>
-          <div class="card-footer"><span><span class="lock-icon">▣</span> ТВОИ ДАННЫЕ ЗАЩИЩЕНЫ</span><span>256-BIT ENCRYPTION</span></div>
+          <button class="submit-button logout-button" id="logout-button">Выйти</button>
         </div>
       </section>
-      <footer class="mobile-footer"><span>© AUTH STARTER 2026</span><span>BUILT WITH SECURITY IN MIND</span></footer>
     </main>
+
+    <footer class="footer">Почта и пароль · Google OAuth · GitHub OAuth</footer>
   </body>
 </html>
