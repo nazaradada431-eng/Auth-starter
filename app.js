@@ -11,6 +11,13 @@ const password = form.elements.password;
 const toggle = document.querySelector('.password-toggle');
 let mode = 'login';
 
+async function readApiJson(response) {
+  if (!response.headers.get('content-type')?.includes('application/json')) {
+    throw new Error('Сервер авторизации не подключён. GitHub Pages размещает только страницу. Для регистрации запусти Node.js сервер командой node server.js.');
+  }
+  return response.json();
+}
+
 function setMode(next) {
   mode = next;
   const register = mode === 'register';
@@ -45,7 +52,7 @@ form.addEventListener('submit', async (event) => {
   if (mode === 'register') payload.name = form.elements.name.value;
   try {
     const response = await fetch(`/api/${mode}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
-    const result = await response.json();
+    const result = await readApiJson(response);
     if (!response.ok) throw new Error(result.error || 'Не удалось выполнить запрос.');
     showUser(result.user);
   } catch (error) {
