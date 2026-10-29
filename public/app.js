@@ -25,7 +25,7 @@ function setMode(next) {
   form.elements.name.required = register;
   password.autocomplete = register ? 'new-password' : 'current-password';
   title.textContent = register ? 'Регистрация' : 'Войти';
-  subtitle.textContent = register ? 'Создай аккаунт по электронной почте.' : 'Войди, используя почту или аккаунт провайдера.';
+  subtitle.textContent = register ? 'Создай аккаунт по электронной почте.' : 'Войди, используя почту и пароль.';
   submitLabel.textContent = register ? 'Зарегистрироваться' : 'Войти';
   step.textContent = register ? '02 — 02' : '01 — 02';
   switchCopy.firstChild.textContent = register ? 'Уже есть аккаунт? ' : 'Впервые здесь? ';
@@ -77,10 +77,4 @@ document.querySelector('#logout-button').addEventListener('click', async () => {
   location.href = '/';
 });
 
-const params = new URLSearchParams(location.search);
-if (params.has('error')) {
-  const error = params.get('error');
-  errorBox.textContent = error === 'email' ? 'Провайдер не передал подтверждённую почту. Войди через почту и пароль.' : error.endsWith('-not-configured') ? `Вход через ${error.split('-')[0]} пока не настроен. Добавь ключи в .env.` : 'Не получилось войти через провайдера. Попробуй ещё раз.';
-  history.replaceState({}, '', '/');
-}
 fetch('/api/me').then((response) => response.json()).then((result) => { if (result.user) showUser(result.user); }).catch(() => {});

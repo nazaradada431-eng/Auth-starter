@@ -2,7 +2,7 @@
   "name": "auth-starter",
   "version": "1.0.0",
   "private": true,
-  "description": "A minimal, secure authentication starter with OAuth providers.",
+  "description": "Minimal email and password authentication starter.",
   "scripts": { "start": "node server.js", "dev": "node --watch server.js" },
   "engines": { "node": ">=20" }
 }

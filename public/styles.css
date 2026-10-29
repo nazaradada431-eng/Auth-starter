@@ -34,23 +34,6 @@ a { color: inherit; text-decoration: none; }
 .card-label, .card-step { color: #737b86; font-size: 11px; }
 h1 { margin: 24px 0 6px; font-size: 24px; line-height: 1.25; font-weight: 600; }
 .card-subtitle { margin: 0 0 22px; color: #68717d; font-size: 13px; line-height: 1.5; }
-.oauth-stack { display: grid; gap: 8px; }
-.oauth-button {
-  display: flex;
-  min-height: 40px;
-  align-items: center;
-  justify-content: center;
-  gap: 9px;
-  border: 1px solid #d7dce2;
-  border-radius: 4px;
-  background: #fff;
-  font-size: 13px;
-}
-.oauth-button:hover { background: #f7f8fa; }
-.google-mark { color: #4285f4; font-size: 16px; font-weight: 700; }
-.github-mark { width: 16px; height: 16px; }
-.divider { display: flex; align-items: center; gap: 12px; margin: 18px 0; color: #737b86; font-size: 12px; }
-.divider::before, .divider::after { height: 1px; flex: 1; background: #e4e7eb; content: ""; }
 .field { display: block; margin-bottom: 14px; }
 .field > span { display: block; margin-bottom: 6px; font-size: 12px; font-weight: 600; }
 .field input {

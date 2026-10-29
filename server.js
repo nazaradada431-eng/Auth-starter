@@ -20,10 +20,6 @@ const PORT = Number(process.env.PORT || 3000);
 const APP_URL = (process.env.APP_URL || `http://localhost:${PORT}`).replace(/\/$/, '');
 const SECRET = process.env.SESSION_SECRET || 'development-only-change-me-before-deploying';
 const COOKIE = 'auth_session';
-const providers = {
-  google: { id: process.env.GOOGLE_CLIENT_ID, secret: process.env.GOOGLE_CLIENT_SECRET },
-  github: { id: process.env.GITHUB_CLIENT_ID, secret: process.env.GITHUB_CLIENT_SECRET },
-};
 
 const b64 = (value) => Buffer.from(value).toString('base64url');
 const sign = (value) => crypto.createHmac('sha256', SECRET).update(value).digest('base64url');
@@ -96,37 +92,6 @@ const server = http.createServer(async (req, res) => {
       setSession(res, user); return json(res, 200, { user: publicUser(user) });
     }
     if (req.method === 'POST' && url.pathname === '/api/logout') { clearSession(res); return json(res, 200, { ok: true }); }
-    if (req.method === 'GET' && url.pathname.startsWith('/auth/')) {
-      const name = url.pathname.split('/')[2]; const provider = providers[name];
-      if (!provider || !provider.id || !provider.secret) return res.writeHead(302, { Location: `/?error=${name}-not-configured` }).end();
-      const state = crypto.randomBytes(24).toString('base64url'); const cookie = `oauth_${name}`;
-      const options = `${cookie}=${state}; HttpOnly; SameSite=Lax; Path=/; Max-Age=600${APP_URL.startsWith('https:') ? '; Secure' : ''}`;
-      res.setHeader('Set-Cookie', options);
-      const callback = `${APP_URL}/auth/${name}/callback`;
-      const destination = name === 'google' ? 'https://accounts.google.com/o/oauth2/v2/auth' : 'https://github.com/login/oauth/authorize';
-      const auth = new URL(destination); auth.searchParams.set('client_id', provider.id); auth.searchParams.set('redirect_uri', callback); auth.searchParams.set('state', state); auth.searchParams.set('scope', name === 'google' ? 'openid email profile' : 'read:user user:email'); auth.searchParams.set('response_type', 'code');
-      return res.writeHead(302, { Location: auth.toString() }).end();
-    }
-    const match = url.pathname.match(/^\/auth\/(google|github)\/callback$/);
-    if (req.method === 'GET' && match) {
-      const name = match[1]; const provider = providers[name]; const cookie = `oauth_${name}`;
-      const savedState = (req.headers.cookie || '').split(';').map((part) => part.trim()).find((part) => part.startsWith(`${cookie}=`))?.slice(cookie.length + 1);
-      if (!url.searchParams.get('state') || !safeEqual(url.searchParams.get('state'), savedState)) return json(res, 400, { error: 'OAuth state не совпадает. Попробуйте ещё раз.' });
-      if (url.searchParams.has('error') || !url.searchParams.get('code')) return res.writeHead(302, { Location: '/?error=oauth' }).end();
-      const callback = `${APP_URL}/auth/${name}/callback`;
-      const tokenResponse = await fetch(name === 'google' ? 'https://oauth2.googleapis.com/token' : 'https://github.com/login/oauth/access_token', { method: 'POST', headers: { 'Content-Type': 'application/json', Accept: 'application/json' }, body: JSON.stringify({ client_id: provider.id, client_secret: provider.secret, code: url.searchParams.get('code'), redirect_uri: callback }) });
-      const token = await tokenResponse.json(); if (!token.access_token) return res.writeHead(302, { Location: '/?error=oauth' }).end();
-      let profile;
-      if (name === 'google') { const response = await fetch('https://www.googleapis.com/oauth2/v2/userinfo', { headers: { Authorization: `Bearer ${token.access_token}` } }); profile = await response.json(); }
-      else {
-        const response = await fetch('https://api.github.com/user', { headers: { Authorization: `Bearer ${token.access_token}`, 'User-Agent': 'auth-starter', Accept: 'application/vnd.github+json' } }); const gh = await response.json();
-        const emailsResponse = await fetch('https://api.github.com/user/emails', { headers: { Authorization: `Bearer ${token.access_token}`, 'User-Agent': 'auth-starter', Accept: 'application/vnd.github+json' } }); const emails = await emailsResponse.json(); profile = { id: gh.id, name: gh.name || gh.login, email: Array.isArray(emails) ? (emails.find((item) => item.primary && item.verified)?.email || emails.find((item) => item.verified)?.email) : null };
-      }
-      if (!profile.email || !validEmail(profile.email)) return res.writeHead(302, { Location: '/?error=email' }).end();
-      const list = await users(); const email = profile.email.toLowerCase(); let user = list.find((item) => item.email === email);
-      if (!user) { user = { id: crypto.randomUUID(), name: profile.name || email.split('@')[0], email, provider: name, createdAt: new Date().toISOString() }; list.push(user); await saveUsers(list); }
-      setSession(res, user); return res.writeHead(302, { Location: '/' }).end();
-    }
     if (req.method === 'GET') return await staticFile(url.pathname, res);
     return json(res, 404, { error: 'Not found' });
   } catch (error) { console.error(error); return json(res, error.status || 500, { error: error.status ? error.message : 'Внутренняя ошибка сервера.' }); }
